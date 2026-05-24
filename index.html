@@ -76,7 +76,7 @@
         const container = document.getElementById('view-quiz'), questionEl = document.getElementById('quiz-question'), optionsEl = document.getElementById('quiz-options'), badgeEl = document.getElementById('quiz-badge'), notifEl = document.getElementById('fake-notification'), overlayEl = document.getElementById('scare-overlay'), scareMsgEl = document.getElementById('scare-msg');
         function startTest() { renderQuestion(); document.getElementById('view-start').style.display = 'none'; container.classList.add('active'); }
         function renderQuestion() {
-            if (currentStage >= quizData.length) { container.innerHTML = `<h2 style="color: #4A3E3D;">測驗結束。<br><br>謝謝你的配合，我已經完全了解你了。</h2>`; return; }
+            if (currentStage >= quizData.length) { container.innerHTML = '<h2 style="color: #4A3E3D;">測驗結束。<br><br>謝謝你的配合，我已經完全了解你了。</h2>'; return; }
             const data = quizData[currentStage]; questionEl.innerHTML = data.q; optionsEl.innerHTML = '';
             if (currentStage === 3) { questionEl.style.fontSize = "12px"; questionEl.style.color = "#888"; } 
             else if (currentStage === 4) { container.classList.add('dark-theme'); document.body.style.backgroundColor = "#111111"; questionEl.style.fontSize = "20px"; questionEl.style.color = "#FFFFFF"; badgeEl.style.background = "#333"; badgeEl.style.color = "#888"; } 
@@ -87,14 +87,16 @@
             if (currentStage === 3) { questionEl.innerHTML = ""; optionsEl.innerHTML = ""; setTimeout(() => { notifEl.style.display = 'flex'; setTimeout(() => { notifEl.style.top = '20px'; }, 50); notifTimeout = setTimeout(() => { if (!isNotificationClicked) { triggerNoClickRoute(); } }, 5000); }, 300); } 
             else { currentStage++; renderQuestion(); }
         }
+        
+        // 核心修正：徹底拔除樣板字串，改用最安全的老式字串拼接，杜絕所有手機報錯卡死
         function appendMessage(text) {
-            const chatBox = document.getElementById('chat-box'), row = document.createElement('div'); row.className = 'msg-row';
-            row.innerHTML = `<div class="avatar"></div><div class="msg-content-wrapper"><div class="sender-name">unknown</div><div class="msg-bubble">${text}</div></div>`;
-            chatBox.appendChild(row); chatBox.scrollTop = chatBox.scrollHeight;
+            const chatBox = document.getElementById('chat-box'), row = document.createElement('div'); 
+            row.className = 'msg-row';
+            row.innerHTML = '<div class="avatar"></div><div class="msg-content-wrapper"><div class="sender-name">unknown</div><div class="msg-bubble">' + text + '</div></div>';
+            chatBox.appendChild(row); 
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
+        
         function clickNotification() {
             isNotificationClicked = true; clearTimeout(notifTimeout); notifEl.style.display = 'none'; document.getElementById('fake-line-app').classList.add('active');
-            setTimeout(() => { appendMessage("我知道你在看。"); setTimeout(() => { appendMessage("測驗做得順利嗎？"); setTimeout(() => { appendMessage("親愛的。"); setTimeout(() => { startFastBombard(); }, 2000); }, 1000); }, 1000); }, 400);
-        }
-        function startFastBombard() {
-    const fastMessages = ["你已讀了。", "為什麼不回我？", "嚇到你了？", "不喜歡我這麼稱呼？", "寶貝。", "sweetheart.", "我的愛。", "為什麼不回覆呢？", "看看我。", "別低頭。", "你這個樣子真迷人。", "看我。", "回頭。"];let i = 0; const interval = setInterval(() => { if (i < fastMessages.length) { appendMessage(fastMessages[i]); i++; } else { clearInterval(interval); setTimeout(() => { document.getElementById('fake-line-app').classList.remove('active'); triggerClickScareEffect(); }, 1500); } }, 320);}function triggerClickScareEffect() {document.body.style.backgroundColor = "#FFFFFF"; overlayEl.style.display = "flex"; scareMsgEl.innerText = "你的眼睛真美。"; scareMsgEl.style.color = "#D63031"; setTimeout(() => { scareMsgEl.style.opacity = 1; }, 50);setTimeout(() => { document.body.classList.add('noise-bg'); document.body.style.backgroundColor = "#555555"; }, 1500);setTimeout(() => { scareMsgEl.style.opacity = 0; document.body.classList.remove('noise-bg'); document.body.style.backgroundColor = "#111111"; setTimeout(() => { overlayEl.style.display = "none"; currentStage = 4; container.classList.add('active'); renderQuestion(); }, 800); }, 4000);}function triggerNoClickRoute() {notifEl.style.display = 'none'; document.body.style.backgroundColor = "#FFFFFF";setTimeout(() => { document.body.style.backgroundColor = "#000000"; overlayEl.style.display = "flex"; scareMsgEl.innerText = "為什麼不看我的訊息？"; scareMsgEl.style.color = "#D63031"; scareMsgEl.style.opacity = 1; }, 150);setTimeout(() => { scareMsgEl.style.opacity = 0; setTimeout(() => { overlayEl.style.display = "none"; currentStage = 4; container.classList.add('active'); renderQuestion(); }, 500); }, 2000);}
+setTimeout(() => { appendMessage("我知道你在看。"); setTimeout(() => { appendMessage("測驗做得順利嗎？"); setTimeout(() => { appendMessage("親愛的。"); setTimeout(() => { startFastBombard(); }, 2000); }, 1000); }, 1000); }, 400);}function startFastBombard() {const fastMessages = ["你已讀了。", "為什麼不回我？", "嚇到你了？", "不喜歡我這麼稱呼？", "寶貝。", "sweetheart.", "我的愛。", "為什麼不回覆呢？", "看看我。", "別低頭。", "你這個樣子真迷人。", "看我。", "回頭。"];let i = 0; const interval = setInterval(() => { if (i < fastMessages.length) { appendMessage(fastMessages[i]); i++; } else { clearInterval(interval); setTimeout(() => { document.getElementById('fake-line-app').classList.remove('active'); triggerClickScareEffect(); }, 1500); } }, 320);}function triggerClickScareEffect() {document.body.style.backgroundColor = "#FFFFFF"; overlayEl.style.display = "flex"; scareMsgEl.innerText = "你的眼睛真美。"; scareMsgEl.style.color = "#D63031"; setTimeout(() => { scareMsgEl.style.opacity = 1; }, 50);setTimeout(() => { document.body.classList.add('noise-bg'); document.body.style.backgroundColor = "#555555"; }, 1500);setTimeout(() => { scareMsgEl.style.opacity = 0; document.body.classList.remove('noise-bg'); document.body.style.backgroundColor = "#111111"; setTimeout(() => { overlayEl.style.display = "none"; currentStage = 4; container.classList.add('active'); renderQuestion(); }, 800); }, 4000);}// 核心修正：沒點通知時，百分之百強制黑底紅字function triggerNoClickRoute() {notifEl.style.display = 'none';document.body.style.backgroundColor = "#000000"; // 1. 直接切換全黑底，杜絕奶茶色overlayEl.style.display = "flex";scareMsgEl.innerText = "為什麼不看我的訊息？";scareMsgEl.style.color = "#D63031"; // 2. 噴出驚悚大紅字scareMsgEl.style.opacity = 1;setTimeout(() => {scareMsgEl.style.opacity = 0;setTimeout(() => {overlayEl.style.display = "none";currentStage = 4;container.classList.add('active');renderQuestion();}, 500);}, 2000);}
